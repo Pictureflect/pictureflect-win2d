@@ -323,6 +323,29 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
         return !!m_isID2D1Factory5Supported;
     }
 
+    bool SharedDeviceState::IsEffectRegistered(IID const& effectId, bool cacheResult) {
+        {
+            RecursiveLock lock(m_mutex);
+            auto it = m_cachedRegisteredEffects.find(effectId);
+            if (it != m_cachedRegisteredEffects.end()) {
+                return it->second;
+            }
+        }
+        auto factory = m_adapter->CreateD2DFactory(CanvasDebugLevel::None);
+        ComPtr<ID2D1Properties> effectProperties;
+        auto hr = factory->GetEffectProperties(effectId, effectProperties.GetAddressOf());
+        bool result = true;
+        if (hr == D2DERR_EFFECT_IS_NOT_REGISTERED || hr == E_NOT_SET) { //E_NOT_SET is returned for UWP apps if the effect is not registered
+            result = false;
+        } else {
+            ThrowIfFailed(hr);
+        }
+        if (cacheResult){
+            RecursiveLock lock(m_mutex);
+            m_cachedRegisteredEffects.insert_or_assign(effectId, result);
+        }
+        return result;
+    }
 
     //
     // CanvasDeviceFactory
