@@ -220,7 +220,7 @@ ComPtr<IInspectable> ResourceManager::GetOrCreate(ICanvasDevice* device, IUnknow
             if (endWrapIt != m_wrappingResources.end()) {
                 m_wrappingResources.erase(endWrapIt);
             }
-         });
+        });
 
         for (auto& tryCreateFunction : tryCreateFunctions)
         {
@@ -375,7 +375,7 @@ void ResourceManager::ValidateDpi(ICanvasResourceWrapperWithDpi* wrapper, float 
 
 ComPtr<ICanvasEffectFactoryNative> ResourceManager::TryGetEffectFactory(REFIID effectId)
 {
-
+    
     std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
     auto effectFactory = m_effectFactories.find(effectId);
