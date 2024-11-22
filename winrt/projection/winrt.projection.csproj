@@ -8,6 +8,7 @@
     <AssemblyName>Microsoft.Graphics.Canvas.Interop</AssemblyName>
     <Platforms>AnyCPU</Platforms>
     <UseUwp>true</UseUwp>
+    <UseRidGraph>true</UseRidGraph>
       
     <!--
       Win2D validates the device type, and initializes it to match 'TargetPlatformIdentifier'
