@@ -27,8 +27,12 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
     {
     public:
         // Used by ResourceWrapper to maintain its state in the interop mapping table.
-        static void Add(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity);
-        static void Remove(IUnknown* resource, IUnknown* wrapperIdentity);
+        static void RegisterWrapper(IUnknown* resource, IInspectable* wrapper);
+        static bool TryRegisterWrapper(IUnknown* resource, IInspectable* wrapper);
+        static void UnregisterWrapper(IUnknown* resource, IInspectable* wrapper); //Note that wrapper can be null if definitely not being created through GetOrCreate
+        static bool TryUnregisterWrapper(IUnknown* resource, IInspectable* wrapper); //Note that wrapper can be null if definitely not being created through GetOrCreate
+        static bool RegisterEffectFactory(REFIID effectId, ICanvasEffectFactoryNative* factory);
+        static bool UnregisterEffectFactory(REFIID effectId);
 
 
         // Used internally, and exposed to apps via CanvasDeviceFactory::GetOrCreate and Microsoft.Graphics.Canvas.native.h.

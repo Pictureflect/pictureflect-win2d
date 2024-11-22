@@ -104,7 +104,14 @@ std::vector<ResourceManager::TryCreateFunction> ResourceManager::tryCreateFuncti
 
 
 // Called by the ResourceWrapper constructor, to add itself to the interop mapping table.
-void ResourceManager::Add(IUnknown* resource, IInspectable* wrapper, IUnknown* wrapperIdentity)
+void ResourceManager::RegisterWrapper(IUnknown* resource, IInspectable* wrapper)
+{
+    if (!TryRegisterWrapper(resource, wrapper))
+        ThrowHR(E_UNEXPECTED);
+}
+
+// Exposed through CanvasDeviceFactory::RegisterWrapper.
+bool ResourceManager::TryRegisterWrapper(IUnknown* resource, IInspectable* wrapper)
 {
     ComPtr<IUnknown> resourceIdentity = AsUnknown(resource);
 
@@ -112,8 +119,8 @@ void ResourceManager::Add(IUnknown* resource, IInspectable* wrapper, IUnknown* w
 
     //If this resource is being wrapped by GetOrCreate, then add wrapperIdentity to m_creatingWrappers instead of adding the resource to m_resources.
     if (m_wrappingResources.find(resourceIdentity.Get()) != m_wrappingResources.end()) {
-        m_creatingWrappers.insert(wrapperIdentity);
-        return;
+        m_creatingWrappers.insert(AsUnknown(wrapper).Get());
+        return true; //We don't want any exceptions thrown in this case
     }
 
     auto result = m_resources.insert(std::make_pair(resourceIdentity.Get(), AsWeak(wrapper)));
@@ -122,23 +129,22 @@ void ResourceManager::Add(IUnknown* resource, IInspectable* wrapper, IUnknown* w
 }
 
 // Called by ResourceWrapper::Close, to remove itself from the interop mapping table.
-void ResourceManager::UnregisterWrapper(IUnknown* resource)
+void ResourceManager::UnregisterWrapper(IUnknown* resource, IInspectable* wrapper)
 {
-    if (!TryUnregisterWrapper(resource))
+    if (!TryUnregisterWrapper(resource, wrapper))
         ThrowHR(E_UNEXPECTED);
 }
 
-
-// Called by ResourceWrapper::Close, to remove itself from the interop mapping table.
-void ResourceManager::Remove(IUnknown* resource, IUnknown* wrapperIdentity)
+// Exposed through CanvasDeviceFactory::UnregisterWrapper.
+bool ResourceManager::TryUnregisterWrapper(IUnknown* resource, IInspectable* wrapper)
 {
     ComPtr<IUnknown> resourceIdentity = AsUnknown(resource);
 
     std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
     //If this wrapper is being created by GetOrCreate, remove from m_creatingWrappers intead of removing the resource from m_resources.
-    if (m_creatingWrappers.erase(wrapperIdentity) > 0) {
-        return;
+    if (wrapper != nullptr && m_creatingWrappers.erase(AsUnknown(wrapper).Get()) > 0) {
+        return true; //We don't want any exceptions thrown in this case
     }
 
     auto result = m_resources.erase(resourceIdentity.Get());
@@ -369,9 +375,9 @@ void ResourceManager::ValidateDpi(ICanvasResourceWrapperWithDpi* wrapper, float 
 
 ComPtr<ICanvasEffectFactoryNative> ResourceManager::TryGetEffectFactory(REFIID effectId)
 {
-    // This lookup doesn't require any locks, as this method is only ever called by CanvasEffect::TryCreateEffect,
-    // which is retrieved from the create factories declared above and invoked from GetOrCreate, which already
-    // acquires a lock to access the ResourceManager internal collections before doing so.
+
+    std::lock_guard<std::recursive_mutex> lock(m_mutex);
+
     auto effectFactory = m_effectFactories.find(effectId);
     
     // Check if we did find a registered effect factory
