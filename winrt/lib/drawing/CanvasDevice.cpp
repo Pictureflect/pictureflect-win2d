@@ -454,7 +454,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
                     ThrowHR(E_INVALIDARG);
                 }
 
-                wasAdded = ResourceManager::TryRegisterWrapper(resource, wrapper);
+                wasAdded = ResourceManager::TryRegisterWrapper(resource, wrapper, nullptr);
             });
 
         if (hresult == S_OK)
