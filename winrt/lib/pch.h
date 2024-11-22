@@ -14,6 +14,16 @@
 #define NOMINMAX                // Stop Windows from defining min() and max() macros that break STL
 #endif
 
+#ifndef WIN2D_DLL_EXPORT
+#define WIN2D_DLL_EXPORT		// Mark public C APIs as being exported (whereas external consumers will import them)
+#endif
+
+#if defined(_M_IX86) && defined(_MSC_VER)
+#ifndef ARCH_X86
+#define ARCH_X86				// Used to detect the x86 architecture so fixups for C exports can be added
+#endif
+#endif
+
 #include <windows.h>
 
 // Standard C++
@@ -51,18 +61,13 @@
 #include <wincodec.h>
 #include <shcore.h>
 #include <robuffer.h>
-
-#ifndef WINDOWS_PHONE
 #include <DocumentSource.h>
 #include <PrintPreview.h>
-#endif
 
-#if WINVER > _WIN32_WINNT_WINBLUE
 #include <d2d1_3.h>
 #include <dwrite_3.h>
 #include <inkrenderer.h>
 #include <MemoryBuffer.h>
-#endif
 
 // WinRT
 #include <windows.foundation.h>
@@ -77,12 +82,9 @@
 #include <windows.ui.xaml.shapes.h>
 #include <windows.graphics.display.h>
 #include <windows.graphics.interop.h>
-
-#if WINVER > _WIN32_WINNT_WINBLUE
 #include <windows.foundation.metadata.h>
 #include <windows.ui.composition.h>
 #include <windows.ui.composition.interop.h>
-#endif
 
 #pragma warning(default: 4265)  // "class has virtual functions, but destructor is not virtual"
 
@@ -98,6 +100,7 @@
 #include <ErrorHandling.h>
 #include <LifespanTracker.h>
 #include <Map.h>
+#include <MicrosoftTelemetry.h>
 #include <Nullable.h>
 #include <ReferenceArray.h>
 #include <RegisteredEvent.h>
@@ -105,6 +108,7 @@
 #include <Singleton.h>
 #include <Utilities.h>
 #include <Vector.h>
+#include <Win2DTelemetry.h>
 #include <WinStringWrapper.h>
 #include <WinStringBuilder.h>
 
