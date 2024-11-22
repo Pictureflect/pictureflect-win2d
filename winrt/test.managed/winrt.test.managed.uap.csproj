@@ -95,6 +95,18 @@
     <None Include="$(AssetDir)TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+     <Content Include="$(AssetDir)Logo.scale-200.png">
+      <Link>Assets\Logo.scale-200.png</Link>
+    </Content>
+    <Content Include="$(AssetDir)SmallLogo.scale-200.png">
+      <Link>Assets\SmallLogo.scale-200.png</Link>
+    </Content>
+    <Content Include="$(AssetDir)SplashScreen.scale-200.png">
+      <Link>Assets\SplashScreen.scale-200.png</Link>
+    </Content>
+    <Content Include="$(AssetDir)StoreLogo.scale-200.png">
+      <Link>Assets\StoreLogo.scale-200.png</Link>
+    </Content>
     <Content Include="$(AssetDir)Logo.scale-240.png">
       <Link>Assets\Logo.scale-240.png</Link>
     </Content>
