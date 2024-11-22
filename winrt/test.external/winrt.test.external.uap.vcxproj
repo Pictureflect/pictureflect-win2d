@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <ProjectGuid>{f33c7cb9-5eca-47b7-9393-81e6e8f0bd34}</ProjectGuid>
     <RootNamespace>Canvas.Test</RootNamespace>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <MinimumVisualStudioVersion>17.0</MinimumVisualStudioVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppContainerApplication>true</AppContainerApplication>
-    <UnitTestPlatformVersion  Condition="'$(UnitTestPlatformVersion)' == ''">16.0</UnitTestPlatformVersion>
+    <UnitTestPlatformVersion Condition="'$(UnitTestPlatformVersion)' == ''">16.0</UnitTestPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
     <ApplicationType>Windows Store</ApplicationType>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
-
+    <_NoWinAPIFamilyApp>true</_NoWinAPIFamilyApp>
   </PropertyGroup>
   <Import Project="..\..\build\Win2D.cpp.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -25,11 +25,12 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include\UWP;..\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib\UWP;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>dxguid.lib;d3d11.lib;d2d1.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxguid.lib;d3d11.lib;d2d1.lib;dwrite.lib;User32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -39,6 +40,7 @@
     <ClCompile Include="CanvasCreateResourcesEventArgsTests.cpp" />
     <ClCompile Include="CanvasDeviceTests.cpp" />
     <ClCompile Include="CanvasBitmapTests.cpp" />
+    <ClCompile Include="CanvasImageInteropTests.cpp" />
     <ClCompile Include="CanvasSvgAttributeTests.cpp" />
     <ClCompile Include="CanvasVirtualBitmapTests.cpp" />
     <ClCompile Include="CanvasEffectsTests.cpp" />
@@ -66,6 +68,7 @@
     <ClCompile Include="DWriteExperiments.cpp" />
     <ClCompile Include="EffectTransferTable3DTests.cpp" />
     <ClCompile Include="Helpers.cpp" />
+    <ClCompile Include="CanvasFactoryNativeTests.cpp" />
     <ClCompile Include="Matrix5x4Test.cpp" />
     <ClCompile Include="RefCountTests.cpp" />
     <ClInclude Include="DebugLayer.h" />

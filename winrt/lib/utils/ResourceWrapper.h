@@ -43,7 +43,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
             if (resource)
             {
                 m_wrapperIdentity = AsUnknown(outerInspectable).Get();
-                ResourceManager::Add(resource, outerInspectable, m_wrapperIdentity);
+                ResourceManager::RegisterWrapper(resource, outerInspectable, m_wrapperIdentity);
             }
         }
 
@@ -58,7 +58,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
             {
                 auto resource = m_resource.Close();
 
-                ResourceManager::Remove(resource.Get(), m_wrapperIdentity);
+                ResourceManager::UnregisterWrapper(resource.Get(), m_wrapperIdentity);
             }
         }
 
@@ -70,7 +70,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
             {
                 m_resource = resource;
 
-                ResourceManager::Add(resource, GetOuterInspectable(), m_wrapperIdentity);
+                ResourceManager::RegisterWrapper(resource, GetOuterInspectable(), m_wrapperIdentity);
             }
         }
 
@@ -149,7 +149,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
         // due to multiple inheritance) because when the ResourceWrapper constructor executes, things
         // are not yet initialized far enough for QI or AsWeak to work from any of the other versions.
         //
-        // outer_inspectable_t is a typedef so it can be customized by types with special needs (eg. CanvasBitmap).
+        // outer_inspectable_t is a typedef so it can be customized by types to support specific scenarios (eg. CanvasBitmap).
 
         typedef TWrapperInterface outer_inspectable_t;
 
