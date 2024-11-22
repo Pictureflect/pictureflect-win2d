@@ -104,22 +104,22 @@ std::vector<ResourceManager::TryCreateFunction> ResourceManager::tryCreateFuncti
 
 
 // Called by the ResourceWrapper constructor, to add itself to the interop mapping table.
-void ResourceManager::RegisterWrapper(IUnknown* resource, IInspectable* wrapper)
+void ResourceManager::RegisterWrapper(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity)
 {
-    if (!TryRegisterWrapper(resource, wrapper))
+    if (!TryRegisterWrapper(resource, wrapper, wrapperIdentity))
         ThrowHR(E_UNEXPECTED);
 }
 
 // Exposed through CanvasDeviceFactory::RegisterWrapper.
-bool ResourceManager::TryRegisterWrapper(IUnknown* resource, IInspectable* wrapper)
+bool ResourceManager::TryRegisterWrapper(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity)
 {
     ComPtr<IUnknown> resourceIdentity = AsUnknown(resource);
 
     std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
     //If this resource is being wrapped by GetOrCreate, then add wrapperIdentity to m_creatingWrappers instead of adding the resource to m_resources.
-    if (m_wrappingResources.find(resourceIdentity.Get()) != m_wrappingResources.end()) {
-        m_creatingWrappers.insert(AsUnknown(wrapper).Get());
+    if (wrapperIdentity != nullptr && m_wrappingResources.find(resourceIdentity.Get()) != m_wrappingResources.end()) {
+        m_creatingWrappers.insert(wrapperIdentity);
         return true; //We don't want any exceptions thrown in this case
     }
 
@@ -129,21 +129,21 @@ bool ResourceManager::TryRegisterWrapper(IUnknown* resource, IInspectable* wrapp
 }
 
 // Called by ResourceWrapper::Close, to remove itself from the interop mapping table.
-void ResourceManager::UnregisterWrapper(IUnknown* resource, IInspectable* wrapper)
+void ResourceManager::UnregisterWrapper(IUnknown* resource, IUnknown * wrapperIdentity)
 {
-    if (!TryUnregisterWrapper(resource, wrapper))
+    if (!TryUnregisterWrapper(resource, wrapperIdentity))
         ThrowHR(E_UNEXPECTED);
 }
 
 // Exposed through CanvasDeviceFactory::UnregisterWrapper.
-bool ResourceManager::TryUnregisterWrapper(IUnknown* resource, IInspectable* wrapper)
+bool ResourceManager::TryUnregisterWrapper(IUnknown* resource, IUnknown * wrapperIdentity)
 {
     ComPtr<IUnknown> resourceIdentity = AsUnknown(resource);
 
     std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
     //If this wrapper is being created by GetOrCreate, remove from m_creatingWrappers intead of removing the resource from m_resources.
-    if (wrapper != nullptr && m_creatingWrappers.erase(AsUnknown(wrapper).Get()) > 0) {
+    if (wrapperIdentity != nullptr && m_creatingWrappers.erase(wrapperIdentity) > 0) {
         return true; //We don't want any exceptions thrown in this case
     }
 
