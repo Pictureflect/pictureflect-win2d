@@ -42,7 +42,8 @@
   <ItemGroup>
     <UAPProject Include="winrt\lib\winrt.lib.uap.vcxproj" />
     <UAPProject Include="winrt\dll\winrt.dll.uap.vcxproj" />
-    <AnyCPUProject Include="winrt\projection\winrt.projection.csproj" />
+    <!-- Todo: undisable this when a working solution can be found. -->
+    <!--<AnyCPUProject Include="winrt\projection\winrt.projection.csproj" />-->
   </ItemGroup>
 
   <!-- Test projects -->
@@ -299,7 +300,7 @@
         <Configuration>%(BuildConfiguration.Identity)</Configuration>
       </ConfigToRestore>
 
-      <NuGetRestore Include="@(ConfigToRestore)" Condition="%(BuildPlatform.Identity) != AnyCPU">
+      <NuGetRestore Include="@(ConfigToRestore)">
         <Platform>%(BuildPlatform.Identity)</Platform>
       </NuGetRestore>
 
