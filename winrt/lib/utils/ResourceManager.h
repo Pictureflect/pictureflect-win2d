@@ -27,8 +27,12 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
     {
     public:
         // Used by ResourceWrapper to maintain its state in the interop mapping table.
-        static void Add(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity);
-        static void Remove(IUnknown* resource, IUnknown* wrapperIdentity);
+        static void RegisterWrapper(IUnknown* resource, IInspectable* wrapper);
+        static bool TryRegisterWrapper(IUnknown* resource, IInspectable* wrapper);
+        static void UnregisterWrapper(IUnknown* resource, IInspectable* wrapper); //Note that wrapper can be null if definitely not being created through GetOrCreate
+        static bool TryUnregisterWrapper(IUnknown* resource, IInspectable* wrapper); //Note that wrapper can be null if definitely not being created through GetOrCreate
+        static bool RegisterEffectFactory(REFIID effectId, ICanvasEffectFactoryNative* factory);
+        static bool UnregisterEffectFactory(REFIID effectId);
 
 
         // Used internally, and exposed to apps via CanvasDeviceFactory::GetOrCreate and Microsoft.Graphics.Canvas.native.h.
@@ -52,9 +56,13 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
         // Validation helpers, also used by ResourceWrapper.
         static void ValidateDevice(IInspectable* wrapper, ICanvasDevice* device);
         static void ValidateDevice(ICanvasResourceWrapperWithDevice* wrapper, ICanvasDevice* device);
+        static void ValidateDevice(ICanvasImageInterop* wrapper, ICanvasDevice* device);
         
         static void ValidateDpi(IInspectable* wrapper, float dpi);
         static void ValidateDpi(ICanvasResourceWrapperWithDpi* wrapper, float dpi);
+
+        // Lookup function used by CanvasEffect::TryCreateEffect to try to resolve external effects
+        static ComPtr<ICanvasEffectFactoryNative> TryGetEffectFactory(REFIID effectId);
 
 
         // A try-create function attempts to wrap a native resource with a WinRT wrapper of a specific type.
@@ -157,6 +165,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
     private:
         // Native resource -> WinRT wrapper map, shared by all active resources.
         static std::unordered_map<IUnknown*, WeakRef> m_resources;
+        static std::unordered_map<IID, ComPtr<ICanvasEffectFactoryNative>> m_effectFactories;
         static std::recursive_mutex m_mutex;
 
         //Used temporarily by GetOrCreate in conjunction with Add/Remove to prevent duplicate wrapped resources without having to lock.

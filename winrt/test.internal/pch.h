@@ -24,6 +24,12 @@ using namespace canvas;
 using namespace ABI::Microsoft::Graphics::Canvas;
 using namespace ABI::Microsoft::Graphics::Canvas::Effects;
 
+#if defined(_M_IX86) && defined(_MSC_VER)
+#ifndef ARCH_X86
+#define ARCH_X86				// Used to detect the x86 architecture so fixups for C exports can be added
+#endif
+#endif
+
 #include "../test.external/MockDxgiDevice.h"
 #include "../test.external/MockDxgiSurface.h"
 
@@ -65,6 +71,7 @@ using namespace ABI::Microsoft::Graphics::Canvas::Effects;
 #include "stubs/StubSurfaceImageSource.h"
 #include "stubs/StubSurfaceImageSourceFactory.h"
 #include "stubs/StubUserControl.h"
+#include "stubs/StubUserControlWithXamlRoot.h"
 #include "stubs/TestBitmapAdapter.h"
 #include "stubs/TestDeviceAdapter.h"
 #include "stubs/SwitchableTestBrushFixture.h"

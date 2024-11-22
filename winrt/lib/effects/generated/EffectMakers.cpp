@@ -44,9 +44,6 @@
 #include "Transform3DEffect.h"
 #include "TurbulenceEffect.h"
 #include "UnPremultiplyEffect.h"
-
-#if (defined _WIN32_WINNT_WIN10) && (WINVER >= _WIN32_WINNT_WIN10)
-
 #include "AlphaMaskEffect.h"
 #include "ChromaKeyEffect.h"
 #include "ContrastEffect.h"
@@ -55,6 +52,7 @@
 #include "EmbossEffect.h"
 #include "ExposureEffect.h"
 #include "GrayscaleEffect.h"
+#include "HdrToneMapEffect.h"
 #include "HighlightsAndShadowsEffect.h"
 #include "HueToRgbEffect.h"
 #include "InvertEffect.h"
@@ -68,8 +66,7 @@
 #include "TemperatureAndTintEffect.h"
 #include "TintEffect.h"
 #include "VignetteEffect.h"
-
-#endif // _WIN32_WINNT_WIN10
+#include "WhiteLevelAdjustmentEffect.h"
 
 
 std::pair<IID, CanvasEffect::MakeEffectFunction> CanvasEffect::m_effectMakers[] =
@@ -112,9 +109,6 @@ std::pair<IID, CanvasEffect::MakeEffectFunction> CanvasEffect::m_effectMakers[] 
     { Transform3DEffect::EffectId(),          MakeEffect<Transform3DEffect>          },
     { TurbulenceEffect::EffectId(),           MakeEffect<TurbulenceEffect>           },
     { UnPremultiplyEffect::EffectId(),        MakeEffect<UnPremultiplyEffect>        },
-
-#if (defined _WIN32_WINNT_WIN10) && (WINVER >= _WIN32_WINNT_WIN10)
-
     { AlphaMaskEffect::EffectId(),            MakeEffect<AlphaMaskEffect>            },
     { ChromaKeyEffect::EffectId(),            MakeEffect<ChromaKeyEffect>            },
     { ContrastEffect::EffectId(),             MakeEffect<ContrastEffect>             },
@@ -123,6 +117,7 @@ std::pair<IID, CanvasEffect::MakeEffectFunction> CanvasEffect::m_effectMakers[] 
     { EmbossEffect::EffectId(),               MakeEffect<EmbossEffect>               },
     { ExposureEffect::EffectId(),             MakeEffect<ExposureEffect>             },
     { GrayscaleEffect::EffectId(),            MakeEffect<GrayscaleEffect>            },
+    { HdrToneMapEffect::EffectId(),           MakeEffect<HdrToneMapEffect>           },
     { HighlightsAndShadowsEffect::EffectId(), MakeEffect<HighlightsAndShadowsEffect> },
     { HueToRgbEffect::EffectId(),             MakeEffect<HueToRgbEffect>             },
     { InvertEffect::EffectId(),               MakeEffect<InvertEffect>               },
@@ -136,8 +131,7 @@ std::pair<IID, CanvasEffect::MakeEffectFunction> CanvasEffect::m_effectMakers[] 
     { TemperatureAndTintEffect::EffectId(),   MakeEffect<TemperatureAndTintEffect>   },
     { TintEffect::EffectId(),                 MakeEffect<TintEffect>                 },
     { VignetteEffect::EffectId(),             MakeEffect<VignetteEffect>             },
-
-#endif // _WIN32_WINNT_WIN10
+    { WhiteLevelAdjustmentEffect::EffectId(), MakeEffect<WhiteLevelAdjustmentEffect> },
 
     { GUID_NULL, nullptr }
 };
