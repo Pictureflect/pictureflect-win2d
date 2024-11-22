@@ -29,8 +29,6 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
                             private LifespanTracker<TWrapper>
     {
         ClosablePtr<TResource> m_resource;
-        //Store the identity of the wrapper so we can safely use it in the destructor (ReleaseResource).
-        IUnknown* m_wrapperIdentity;
 
     protected:
         ResourceWrapper(TResource* resource)
@@ -42,8 +40,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
         {
             if (resource)
             {
-                m_wrapperIdentity = AsUnknown(outerInspectable).Get();
-                ResourceManager::RegisterWrapper(resource, outerInspectable, m_wrapperIdentity);
+                ResourceManager::RegisterWrapper(resource, outerInspectable);
             }
         }
 
@@ -58,7 +55,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
             {
                 auto resource = m_resource.Close();
 
-                ResourceManager::UnregisterWrapper(resource.Get(), m_wrapperIdentity);
+                ResourceManager::UnregisterWrapper(resource.Get(), GetOuterInspectable());
             }
         }
 
@@ -70,7 +67,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
             {
                 m_resource = resource;
 
-                ResourceManager::RegisterWrapper(resource, GetOuterInspectable(), m_wrapperIdentity);
+                ResourceManager::RegisterWrapper(resource, GetOuterInspectable());
             }
         }
 
