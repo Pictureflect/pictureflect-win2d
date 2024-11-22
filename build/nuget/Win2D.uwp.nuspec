@@ -16,14 +16,20 @@
     <dependencies>
       <group targetFramework="native" />
       <group targetFramework="net45" />
+      <!-- todo: restore this line once a working solution has been found. -->
+      <!--
       <group targetFramework="net8.0-windows10.0.19041" />
+      -->
       <group targetFramework="uap10.0" />
     </dependencies>
+    <!-- todo: restore these lines once a working solution has been found. -->
+    <!--
     <frameworkReferences>
       <group targetFramework="net8.0-windows10.0.19041">
         <frameworkReference name="Microsoft.Windows.SDK.NET.Ref.Xaml" />
       </group>
     </frameworkReferences>
+    -->
   </metadata>
 
   <files>
@@ -32,7 +38,10 @@
 
     <file target="build\native\Win2D.uwp.targets"                          src="build\nuget\Win2D.uwp-native.targets" />
     <file target="build\net45\Win2D.uwp.targets"                           src="build\nuget\Win2D.uwp-managed.targets" />
+    <!-- todo: restore this line once a working solution has been found. -->
+    <!--
     <file target="build\net8.0-windows10.0.19041.0\Win2D.uwp.targets"      src="build\nuget\Win2D.uwp-cswinrt.targets" />
+    -->
     <file target="build\uap10.0\Win2D.uwp.targets"                         src="build\nuget\Win2D.uwp-win10.targets" />
     <file target="build\Win2D.common.targets"                              src="build\nuget\Win2D.common.targets" />
 
