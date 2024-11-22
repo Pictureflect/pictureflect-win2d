@@ -375,7 +375,7 @@ void ResourceManager::ValidateDpi(ICanvasResourceWrapperWithDpi* wrapper, float 
 
 ComPtr<ICanvasEffectFactoryNative> ResourceManager::TryGetEffectFactory(REFIID effectId)
 {
-
+    
     std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
     auto effectFactory = m_effectFactories.find(effectId);
