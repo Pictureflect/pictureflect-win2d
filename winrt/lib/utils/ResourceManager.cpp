@@ -250,6 +250,7 @@ ComPtr<IInspectable> ResourceManager::GetOrCreate(ICanvasDevice* device, IUnknow
             wrapper = existingWrapper;
         } else {
             //Else, remove the wrapper from the m_creatingWrappers set and add the resource to m_resources.
+            //Note if created by a registered external effect factory, it will not be present in m_creatingWrappers, but that's fine.
             m_creatingWrappers.erase(AsUnknown(wrapper.Get()).Get());
             auto result = m_resources.insert(std::make_pair(resourceIdentity.Get(), AsWeak(wrapper.Get())));
             if (!result.second) {

@@ -27,10 +27,12 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas
     {
     public:
         // Used by ResourceWrapper to maintain its state in the interop mapping table.
-        static void RegisterWrapper(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity); //Note that wrapperIdentity can be null if definitely not being created through GetOrCreate
-        static bool TryRegisterWrapper(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity); //Note that wrapperIdentity can be null if definitely not being created through GetOrCreate
-        static void UnregisterWrapper(IUnknown* resource, IUnknown * wrapperIdentity); //Note that wrapperIdentity can be null if definitely not being created through GetOrCreate
-        static bool TryUnregisterWrapper(IUnknown* resource, IUnknown * wrapperIdentity); //Note that wrwrapperIdentityapper can be null if definitely not being created through GetOrCreate
+        // Note that wrapperIdentity should be null if directly registering/unregistering an external wrapper (not being created through GetOrCreate), 
+        // otherwise it should be the IUnknown pointer which represents the object's identity in COM.
+        static void RegisterWrapper(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity);
+        static bool TryRegisterWrapper(IUnknown* resource, IInspectable* wrapper, IUnknown * wrapperIdentity);
+        static void UnregisterWrapper(IUnknown* resource, IUnknown * wrapperIdentity);
+        static bool TryUnregisterWrapper(IUnknown* resource, IUnknown * wrapperIdentity);
         static bool RegisterEffectFactory(REFIID effectId, ICanvasEffectFactoryNative* factory);
         static bool UnregisterEffectFactory(REFIID effectId);
 
