@@ -1,5 +1,10 @@
 # Win2D Changelog
 
+## Win2D 1.28.1
+_December 12th, 2024_
+- Enable automatic .winmd registration for MSIX apps on .NET 8
+- Update Windows SDK projections and CsWinRT to latest
+
 ## Win2D 1.28.0
 _October 9th, 2024_
 - Update Windows SDK projections and CsWinRT to latest
