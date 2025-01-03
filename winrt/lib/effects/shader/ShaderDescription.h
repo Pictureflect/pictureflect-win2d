@@ -67,6 +67,26 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         bool operator() (HSTRING               value1, ShaderVariable const& value2) const { return comparison(value1, value2.Name); }
     };
 
+    const int MaxShaderInputs = 8;
+
+    // Describes how this shader maps between its input images and output locations.
+    struct CoordinateMappingState
+    {
+        CoordinateMappingState()
+            : MaxOffset(0)
+        {
+            for (int i = 0; i < MaxShaderInputs; i++)
+            {
+                Mapping[i] = SamplerCoordinateMapping::Unknown;
+                BorderMode[i] = EffectBorderMode::Soft;
+            }
+        }
+
+        SamplerCoordinateMapping Mapping[MaxShaderInputs];
+        EffectBorderMode BorderMode[MaxShaderInputs];
+        int MaxOffset;
+    };
+
 
     // Copyable struct stores shader program code along with metadata describing how to use the shader.
     struct ShaderDescription
@@ -90,6 +110,9 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
         // Sorted by name.
         std::vector<ShaderVariable> Variables;
+
+        std::vector<BYTE> DefaultConstants;
+        CoordinateMappingState DefaultCoordinateMapping;
     };
 
 }}}}}

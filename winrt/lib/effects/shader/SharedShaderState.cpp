@@ -8,16 +8,6 @@
 
 namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { namespace Effects
 {
-    CoordinateMappingState::CoordinateMappingState()
-        : MaxOffset(0)
-    {
-        for (int i = 0; i < MaxShaderInputs; i++)
-        {
-            Mapping[i] = SamplerCoordinateMapping::Unknown;
-            BorderMode[i] = EffectBorderMode::Soft;
-        }
-    }
-
 
     SourceInterpolationState::SourceInterpolationState()
     {
@@ -28,7 +18,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     }
 
 
-    SharedShaderState::SharedShaderState(ShaderDescription const& shader, std::vector<BYTE> const& constants, CoordinateMappingState const& coordinateMapping, SourceInterpolationState const& sourceInterpolation)
+    SharedShaderState::SharedShaderState(std::shared_ptr<ShaderDescription> const& shader, std::vector<BYTE> const& constants, CoordinateMappingState const& coordinateMapping, SourceInterpolationState const& sourceInterpolation)
         : m_shader(shader)
         , m_constants(constants)
         , m_coordinateMapping(coordinateMapping)
@@ -38,16 +28,30 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
     SharedShaderState::SharedShaderState(BYTE* shaderCode, uint32_t shaderCodeSize)
     {
-        // Store the shader program code.
-        m_shader.Code.assign(shaderCode, shaderCode + shaderCodeSize);
-
-        // Hash it to generate a unique ID.
+        // Hash the code to generate a unique ID.
         static const IID salt{ 0x489257f6, 0x6544, 0x4277, 0x89, 0x82, 0xea, 0xd1, 0x69, 0x39, 0x1f, 0x3d };
 
-        m_shader.Hash = GetVersion5Uuid(salt, shaderCode, shaderCodeSize);
+        auto hash = GetVersion5Uuid(salt, shaderCode, shaderCodeSize);
+
+        m_shader = CreateShaderDescription(shaderCode, shaderCodeSize, hash);
+        m_constants = m_shader->DefaultConstants;
+        m_coordinateMapping = m_shader->DefaultCoordinateMapping;
+    }
+
+
+    std::shared_ptr<ShaderDescription> SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId)
+    {
+        auto shader = std::make_shared<ShaderDescription>();
+
+        // Store the shader program code.
+        shader->Code.assign(shaderCode, shaderCode + shaderCodeSize);
+
+        shader->Hash = effectId;
 
         // Look up shader metadata.
-        ReflectOverShader();
+        ReflectOverShader(shader);
+
+        return shader;
     }
 
 
@@ -62,13 +66,13 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
     unsigned SharedShaderState::GetPropertyCount()
     {
-        return static_cast<unsigned>(m_shader.Variables.size());
+        return static_cast<unsigned>(m_shader->Variables.size());
     }
 
 
     bool SharedShaderState::HasProperty(HSTRING name)
     {
-        return std::binary_search(m_shader.Variables.begin(), m_shader.Variables.end(), name, VariableNameComparison());
+        return std::binary_search(m_shader->Variables.begin(), m_shader->Variables.end(), name, VariableNameComparison());
     }
 
 
@@ -210,9 +214,9 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     {
         std::vector<StringObjectPair> properties;
 
-        properties.reserve(m_shader.Variables.size());
+        properties.reserve(m_shader->Variables.size());
 
-        for (auto& variable : m_shader.Variables)
+        for (auto& variable : m_shader->Variables)
         {
             properties.emplace_back(variable.Name, GetProperty(variable));
         }
@@ -225,9 +229,9 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     {
         VariableNameComparison comparison;
 
-        auto it = std::lower_bound(m_shader.Variables.begin(), m_shader.Variables.end(), name, comparison);
+        auto it = std::lower_bound(m_shader->Variables.begin(), m_shader->Variables.end(), name, comparison);
 
-        if (it == m_shader.Variables.end() || comparison(name, *it))
+        if (it == m_shader->Variables.end() || comparison(name, *it))
         {
             WinStringBuilder message;
             message.Format(Strings::CustomEffectUnknownProperty, WindowsGetStringRawBuffer(name, nullptr));
@@ -460,12 +464,12 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     }
 
 
-    void SharedShaderState::ReflectOverShader()
+    void SharedShaderState::ReflectOverShader(std::shared_ptr<ShaderDescription> const& outputDescription)
     {
         // Create the shader reflection interface.
         ComPtr<ID3D11ShaderReflection> reflector;
 
-        HRESULT hr = D3DReflect(m_shader.Code.data(), m_shader.Code.size(), IID_PPV_ARGS(&reflector));
+        HRESULT hr = D3DReflect(outputDescription->Code.data(), outputDescription->Code.size(), IID_PPV_ARGS(&reflector));
 
         if (FAILED(hr))
             ThrowHR(E_INVALIDARG, Strings::CustomEffectBadShader);
@@ -484,25 +488,25 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         }
 
         // Examine the input bindings.
-        ReflectOverBindings(reflector.Get(), desc);
+        ReflectOverBindings(outputDescription, reflector.Get(), desc);
 
         // Store the mapping from named constants to buffer locations.
         if (desc.ConstantBuffers)
         {
-            ReflectOverConstantBuffer(reflector->GetConstantBufferByIndex(0));
+            ReflectOverConstantBuffer(outputDescription, reflector->GetConstantBufferByIndex(0));
         }
 
         // Grab some other metadata.
-        m_shader.InstructionCount = desc.InstructionCount;
+        outputDescription->InstructionCount = desc.InstructionCount;
 
-        ThrowIfFailed(reflector->GetMinFeatureLevel(&m_shader.MinFeatureLevel));
+        ThrowIfFailed(reflector->GetMinFeatureLevel(&outputDescription->MinFeatureLevel));
 
         // If this shader was compiled to support shader linking, we can also determine which inputs are simple vs. complex.
-        ReflectOverShaderLinkingFunction();
+        ReflectOverShaderLinkingFunction(outputDescription);
     }
 
 
-    void SharedShaderState::ReflectOverBindings(ID3D11ShaderReflection* reflector, D3D11_SHADER_DESC const& desc)
+    void SharedShaderState::ReflectOverBindings(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflection* reflector, D3D11_SHADER_DESC const& desc)
     {
         for (unsigned i = 0; i < desc.BoundResources; i++)
         {
@@ -516,7 +520,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
                     ThrowHR(E_INVALIDARG, Strings::CustomEffectTooManyTextures);
 
                 // Record how many input textures this shader uses.
-                m_shader.InputCount = std::max(m_shader.InputCount, inputDesc.BindPoint + 1);
+                outputDescription->InputCount = std::max(outputDescription->InputCount, inputDesc.BindPoint + 1);
                 break;
 
             case D3D_SIT_CBUFFER:
@@ -529,24 +533,24 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     }
 
 
-    void SharedShaderState::ReflectOverConstantBuffer(ID3D11ShaderReflectionConstantBuffer* constantBuffer)
+    void SharedShaderState::ReflectOverConstantBuffer(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflectionConstantBuffer* constantBuffer)
     {
         D3D11_SHADER_BUFFER_DESC desc;
         ThrowIfFailed(constantBuffer->GetDesc(&desc));
 
         // Resize our constant buffer to match the shader.
-        m_constants.resize(desc.Size);
+        outputDescription->DefaultConstants.resize(desc.Size);
 
         // Look up variable metadata.
-        m_shader.Variables.reserve(desc.Variables);
+        outputDescription->Variables.reserve(desc.Variables);
 
         for (unsigned i = 0; i < desc.Variables; i++)
         {
-            ReflectOverVariable(constantBuffer->GetVariableByIndex(i));
+            ReflectOverVariable(outputDescription, constantBuffer->GetVariableByIndex(i));
         }
 
         // Sort the variables by name.
-        std::sort(m_shader.Variables.begin(), m_shader.Variables.end(), VariableNameComparison());
+        std::sort(outputDescription->Variables.begin(), outputDescription->Variables.end(), VariableNameComparison());
     }
 
 
@@ -629,7 +633,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     }
 
 
-    void SharedShaderState::ReflectOverVariable(ID3D11ShaderReflectionVariable* variable)
+    void SharedShaderState::ReflectOverVariable(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflectionVariable* variable)
     {
         D3D11_SHADER_VARIABLE_DESC desc;
         ThrowIfFailed(variable->GetDesc(&desc));
@@ -652,7 +656,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         // This can only fail if the shader blob is corrupted.
         auto endOffset = desc.StartOffset + desc.Size;
 
-        if (endOffset > m_constants.size() || endOffset < desc.StartOffset)
+        if (endOffset > outputDescription->DefaultConstants.size() || endOffset < desc.StartOffset)
         {
             ThrowHR(E_UNEXPECTED);
         }
@@ -660,15 +664,15 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         // Initialize our constant buffer with the default value of the variable.
         if (desc.DefaultValue)
         {
-            CopyDefaultValue(m_constants.data() + desc.StartOffset, desc, type);
+            CopyDefaultValue(outputDescription->DefaultConstants.data() + desc.StartOffset, desc, type);
         }
 
         // Store metadata about this variable.
-        m_shader.Variables.emplace_back(desc, type);
+        outputDescription->Variables.emplace_back(desc, type);
     }
 
 
-    void SharedShaderState::ReflectOverShaderLinkingFunction()
+    void SharedShaderState::ReflectOverShaderLinkingFunction(std::shared_ptr<ShaderDescription> const& outputDescription)
     {
         // If this shader was compiled to support shader linking, we can get extra information
         // (telling us which inputs are simple vs. complex) from the shader linking function.
@@ -676,7 +680,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         // It's valid to use shaders that don't support linking, so we return on failure rather than throwing.
         ComPtr<ID3DBlob> privateData;
 
-        if (FAILED(D3DGetBlobPart(m_shader.Code.data(), m_shader.Code.size(), D3D_BLOB_PRIVATE_DATA, 0, &privateData)))
+        if (FAILED(D3DGetBlobPart(outputDescription->Code.data(), outputDescription->Code.size(), D3D_BLOB_PRIVATE_DATA, 0, &privateData)))
             return;
 
         ComPtr<ID3D11LibraryReflection> reflector;
@@ -711,7 +715,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
             else if (strstr(parameterDesc.SemanticName, "INPUT"))
             {
                 // INPUT semantic means a simple input, so select passthrough coordinate mapping mode.
-                m_coordinateMapping.Mapping[inputCount++] = SamplerCoordinateMapping::OneToOne;
+                outputDescription->DefaultCoordinateMapping.Mapping[inputCount++] = SamplerCoordinateMapping::OneToOne;
             }
         }
     }
