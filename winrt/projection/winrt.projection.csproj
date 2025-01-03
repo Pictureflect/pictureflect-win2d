@@ -29,7 +29,7 @@
         - Set "AssemblyFile" to match the assembly version.
         - Set "AssemblyInformationVersion" to $(Version) plus git hash (eg. "1.1.0-preview1+1b95cfe91e").
     -->
-    <Version>1.28.3</Version>
+    <Version>1.28.4</Version>
 
     <!-- Enable trim/AOT compatibility -->
     <IsAotCompatible>true</IsAotCompatible>
