@@ -199,6 +199,31 @@ Licensed under the MIT License. See LICENSE.txt in the project root for license 
         </ul>
       </remarks>
     </member>
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect">
+      <summary>Registers the shader code using the given effectId, which must be unique, and performs one-time reflection over the shader code to extract constant property names etc. Does nothing if the effectId is already registered.</summary>
+      <remarks>
+        <p>
+          Throws an exception if the reflection over the shader code fails. See <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.#ctor(System.Byte[])"/> for more detail about the shader code requirements.
+        </p>
+      </remarks>
+    </member>
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.CreateEffect">
+      <summary>Initializes a new instance of the PixelShaderEffect class using the shader code which was previously registered using the given effectId.</summary>
+      <remarks>
+        <p>
+          Throws an exception if not registered.
+        </p>
+      </remarks>
+    </member>
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterAndCreateEffect">
+      <summary>Calls <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect"/> then <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.CreateEffect"/>.</summary>
+    </member>
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.IsEffectRegistered">
+      <summary>Check to see if the given effectId has been registered via <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect"/>.</summary>
+    </member>
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.UnregisterEffect">
+      <summary>Removes the cached shader code with the given effectId. Does nothing if not registered.</summary>
+    </member>
     <member name="P:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.Source1">
       <summary>Gets or sets the first input source for the custom pixel shader.</summary>
     </member>
