@@ -29,11 +29,17 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         //
         // IPixelShaderEffectStatics
         //
-        IFACEMETHOD(RegisterEffect)(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId) override;
+        IFACEMETHOD(RegisterEffect)(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId, int32_t maxSamplerOffset, 
+            uint32_t coordinateMappingsSize, SamplerCoordinateMapping* coordinateMappings, 
+            uint32_t borderModesSize, EffectBorderMode* borderModes, 
+            uint32_t sourceInterpolationsSize, CanvasImageInterpolation* sourceInterpolations) override;
 
         IFACEMETHOD(CreateEffect)(GUID effectId, IPixelShaderEffect** effect) override;
 
-        IFACEMETHOD(RegisterAndCreateEffect)(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId, IPixelShaderEffect** effect) override;
+        IFACEMETHOD(RegisterAndCreateEffect)(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId, int32_t maxSamplerOffset, 
+            uint32_t coordinateMappingsSize, SamplerCoordinateMapping* coordinateMappings, 
+            uint32_t borderModesSize, EffectBorderMode* borderModes, 
+            uint32_t sourceInterpolationsSize, CanvasImageInterpolation* sourceInterpolations, IPixelShaderEffect** effect) override;
 
         IFACEMETHOD(IsEffectRegistered)(GUID effectId, boolean* result) override;
 

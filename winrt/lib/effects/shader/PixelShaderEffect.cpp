@@ -31,7 +31,10 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         });
     }
 
-    IFACEMETHODIMP PixelShaderEffectFactory::RegisterEffect(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId)
+    IFACEMETHODIMP PixelShaderEffectFactory::RegisterEffect(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId, int32_t maxSamplerOffset, 
+        uint32_t coordinateMappingsSize, SamplerCoordinateMapping* coordinateMappings, 
+        uint32_t borderModesSize, EffectBorderMode* borderModes, 
+        uint32_t sourceInterpolationsSize, CanvasImageInterpolation* sourceInterpolations)
     {
         return ExceptionBoundary([&]
         {
@@ -48,7 +51,8 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
             }
 
             CheckInPointer(shaderCode);
-            auto description = SharedShaderState::CreateShaderDescription(shaderCode, shaderCodeCount, effectId);
+            auto description = SharedShaderState::CreateShaderDescription(shaderCode, shaderCodeCount, effectId, maxSamplerOffset, 
+                coordinateMappings, coordinateMappingsSize, borderModes, borderModesSize, sourceInterpolations, sourceInterpolationsSize);
 
             {
                 std::lock_guard<std::recursive_mutex> lock(m_mutex);
@@ -81,7 +85,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
             }
 
             // Create a shared state object using the specified shader code.
-            auto sharedState = Make<SharedShaderState>(description, description->DefaultConstants, description->DefaultCoordinateMapping, SourceInterpolationState());
+            auto sharedState = Make<SharedShaderState>(description, description->DefaultConstants, description->DefaultCoordinateMapping, description->DefaultSourceInterpolation);
             CheckMakeResult(sharedState);
 
             // Create the WinRT effect instance.
@@ -92,11 +96,14 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         });
     }
 
-    IFACEMETHODIMP PixelShaderEffectFactory::RegisterAndCreateEffect(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId, IPixelShaderEffect** effect)
+    IFACEMETHODIMP PixelShaderEffectFactory::RegisterAndCreateEffect(UINT32 shaderCodeCount, BYTE* shaderCode, GUID effectId, int32_t maxSamplerOffset, 
+        uint32_t coordinateMappingsSize, SamplerCoordinateMapping* coordinateMappings, 
+        uint32_t borderModesSize, EffectBorderMode* borderModes, 
+        uint32_t sourceInterpolationsSize, CanvasImageInterpolation* sourceInterpolations, IPixelShaderEffect** effect)
     {
         return ExceptionBoundary([&]
         {
-            ThrowIfFailed(RegisterEffect(shaderCodeCount, shaderCode, effectId));
+            ThrowIfFailed(RegisterEffect(shaderCodeCount, shaderCode, effectId, maxSamplerOffset, coordinateMappingsSize, coordinateMappings, borderModesSize, borderModes, sourceInterpolationsSize, sourceInterpolations));
             ThrowIfFailed(CreateEffect(effectId, effect));
         });
     }

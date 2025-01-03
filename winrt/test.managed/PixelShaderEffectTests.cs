@@ -334,7 +334,7 @@ namespace test.managed
             ";
 
             var effectId = Guid.Parse("{A686195C-AEA4-45B7-87EF-BDD57776A7F4");
-            var effect = PixelShaderEffect.RegisterAndCreateEffect(ShaderCompiler.CompileShader(hlsl, "ps_4_0"), effectId);
+            var effect = PixelShaderEffect.RegisterAndCreateEffect(ShaderCompiler.CompileShader(hlsl, "ps_4_0"), effectId, 0, null, null, null);
 
             using (var canvasDevice = new CanvasDevice())
             using (var renderTarget = new CanvasRenderTarget(canvasDevice, 1, 1, 96))

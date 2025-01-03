@@ -9,15 +9,6 @@
 namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { namespace Effects
 {
 
-    SourceInterpolationState::SourceInterpolationState()
-    {
-        for (int i = 0; i < MaxShaderInputs; i++)
-        {
-            Filter[i] = D2D1_FILTER_MIN_MAG_MIP_LINEAR;
-        }
-    }
-
-
     SharedShaderState::SharedShaderState(std::shared_ptr<ShaderDescription> const& shader, std::vector<BYTE> const& constants, CoordinateMappingState const& coordinateMapping, SourceInterpolationState const& sourceInterpolation)
         : m_shader(shader)
         , m_constants(constants)
@@ -33,13 +24,15 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
         auto hash = GetVersion5Uuid(salt, shaderCode, shaderCodeSize);
 
-        m_shader = CreateShaderDescription(shaderCode, shaderCodeSize, hash);
+        m_shader = CreateShaderDescription(shaderCode, shaderCodeSize, hash, 0, nullptr, 0, nullptr, 0, nullptr, 0);
         m_constants = m_shader->DefaultConstants;
         m_coordinateMapping = m_shader->DefaultCoordinateMapping;
+        m_sourceInterpolation = m_shader->DefaultSourceInterpolation;
     }
 
 
-    std::shared_ptr<ShaderDescription> SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId)
+    std::shared_ptr<ShaderDescription> SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId, int32_t maxSamplerOffset, 
+        SamplerCoordinateMapping* coordinateMappings, uint32_t coordinateMappingsSize, EffectBorderMode* borderModes, uint32_t borderModesSize, CanvasImageInterpolation* sourceInterpolations, uint32_t sourceInterpolationsSize)
     {
         auto shader = std::make_shared<ShaderDescription>();
 
@@ -50,6 +43,25 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
         // Look up shader metadata.
         ReflectOverShader(shader);
+        shader->DefaultCoordinateMapping.MaxOffset = maxSamplerOffset;
+        if (coordinateMappings != nullptr) {
+            for (uint32_t i = 0; i < coordinateMappingsSize && i < MaxShaderInputs; i++) {
+                shader->DefaultCoordinateMapping.Mapping[i] = coordinateMappings[i];
+            }
+        }
+        if (borderModes != nullptr) {
+            for (uint32_t i = 0; i < borderModesSize && i < MaxShaderInputs; i++) {
+                shader->DefaultCoordinateMapping.BorderMode[i] = borderModes[i];
+            }
+        }
+        if (sourceInterpolations != nullptr) {
+            for (uint32_t i = 0; i < sourceInterpolationsSize && i < MaxShaderInputs; i++) {
+                auto d2dFilter = ToD2DFilter(sourceInterpolations[i]);
+                if (d2dFilter != D2D1_FILTER_FORCE_DWORD) {
+                    shader->DefaultSourceInterpolation.Filter[i] = d2dFilter;
+                }
+            }
+        }
 
         return shader;
     }
