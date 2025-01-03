@@ -12,20 +12,6 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
     enum class CopyDirection { Read, Write };
 
-    const int MaxShaderInputs = 8;
-
-
-    // Describes how this shader maps between its input images and output locations.
-    struct CoordinateMappingState
-    {
-        CoordinateMappingState();
-
-        SamplerCoordinateMapping Mapping[MaxShaderInputs];
-        EffectBorderMode BorderMode[MaxShaderInputs];
-        int MaxOffset;
-    };
-
-
     // Configures the filtering mode used to sample shader source textures.
     struct SourceInterpolationState
     {
@@ -51,7 +37,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     public:
         virtual ComPtr<ISharedShaderState> Clone() = 0;
 
-        virtual ShaderDescription const& Shader() = 0;
+        virtual std::shared_ptr<ShaderDescription> const& Shader() = 0;
         virtual std::vector<BYTE> const& Constants() = 0;
         virtual CoordinateMappingState& CoordinateMapping() = 0;
         virtual SourceInterpolationState& SourceInterpolation() = 0;
@@ -68,18 +54,19 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     class SharedShaderState : public RuntimeClass<RuntimeClassFlags<ClassicCom>, ISharedShaderState>
                             , private LifespanTracker<SharedShaderState>
     {
-        ShaderDescription m_shader;
+        std::shared_ptr<ShaderDescription> m_shader;
         std::vector<BYTE> m_constants;
         CoordinateMappingState m_coordinateMapping;
         SourceInterpolationState m_sourceInterpolation;
 
     public:
-        SharedShaderState(ShaderDescription const& shader, std::vector<BYTE> const& constants, CoordinateMappingState const& coordinateMapping, SourceInterpolationState const& sourceInterpolation);
+        SharedShaderState(std::shared_ptr<ShaderDescription> const& shader, std::vector<BYTE> const& constants, CoordinateMappingState const& coordinateMapping, SourceInterpolationState const& sourceInterpolation);
         SharedShaderState(BYTE* shaderCode, uint32_t shaderCodeSize);
+        static std::shared_ptr<ShaderDescription> SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId);
 
         virtual ComPtr<ISharedShaderState> Clone() override;
 
-        virtual ShaderDescription const& Shader() override { return m_shader; }
+        virtual std::shared_ptr<ShaderDescription> const& Shader() override { return m_shader; }
         virtual std::vector<BYTE> const& Constants() override { return m_constants; }
         virtual CoordinateMappingState& CoordinateMapping() override { return m_coordinateMapping; }
         virtual SourceInterpolationState& SourceInterpolation() { return m_sourceInterpolation; }
@@ -108,11 +95,11 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
 
         // Shader reflection (done at init time).
-        void ReflectOverShader();
-        void ReflectOverBindings(ID3D11ShaderReflection* reflector, D3D11_SHADER_DESC const& desc);
-        void ReflectOverConstantBuffer(ID3D11ShaderReflectionConstantBuffer* constantBuffer);
-        void ReflectOverVariable(ID3D11ShaderReflectionVariable* variable);
-        void ReflectOverShaderLinkingFunction();
+        static void ReflectOverShader(std::shared_ptr<ShaderDescription> const& outputDescription);
+        static void ReflectOverBindings(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflection* reflector, D3D11_SHADER_DESC const& desc);
+        static void ReflectOverConstantBuffer(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflectionConstantBuffer* constantBuffer);
+        static void ReflectOverVariable(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflectionVariable* variable);
+        static void ReflectOverShaderLinkingFunction(std::shared_ptr<ShaderDescription> const& outputDescription);
     };
 
 }}}}}
