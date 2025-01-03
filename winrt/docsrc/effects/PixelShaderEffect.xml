@@ -199,7 +199,7 @@ Licensed under the MIT License. See LICENSE.txt in the project root for license 
         </ul>
       </remarks>
     </member>
-    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect">
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect(System.Byte[],System.Guid)">
       <summary>Registers the shader code using the given effectId, which must be unique, and performs one-time reflection over the shader code to extract constant property names etc. Does nothing if the effectId is already registered.</summary>
       <remarks>
         <p>
@@ -207,7 +207,7 @@ Licensed under the MIT License. See LICENSE.txt in the project root for license 
         </p>
       </remarks>
     </member>
-    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.CreateEffect">
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.CreateEffect(System.Guid)">
       <summary>Initializes a new instance of the PixelShaderEffect class using the shader code which was previously registered using the given effectId.</summary>
       <remarks>
         <p>
@@ -215,13 +215,13 @@ Licensed under the MIT License. See LICENSE.txt in the project root for license 
         </p>
       </remarks>
     </member>
-    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterAndCreateEffect">
-      <summary>Calls <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect"/> then <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.CreateEffect"/>.</summary>
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterAndCreateEffect(System.Byte[],System.Guid)">
+      <summary>Calls <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect(System.Byte[],System.Guid)"/> then <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.CreateEffect(System.Guid)"/>.</summary>
     </member>
-    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.IsEffectRegistered">
-      <summary>Check to see if the given effectId has been registered via <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect"/>.</summary>
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.IsEffectRegistered(System.Guid)">
+      <summary>Check to see if the given effectId has been registered via <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect(System.Byte[],System.Guid)"/>.</summary>
     </member>
-    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.UnregisterEffect">
+    <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.UnregisterEffect(System.Guid)">
       <summary>Removes the cached shader code with the given effectId. Does nothing if not registered.</summary>
     </member>
     <member name="P:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.Source1">
