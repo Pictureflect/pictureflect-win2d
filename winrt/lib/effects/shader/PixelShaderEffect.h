@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Utils/GuidUtilities.h"
+#include "../../utils/GuidUtilities.h"
 #include "ShaderDescription.h"
 
 namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { namespace Effects 
