@@ -20,7 +20,14 @@ namespace Microsoft.Graphics.Canvas.Effects
         HRESULT RegisterEffect(
             [in] UINT32 shaderCodeCount,
             [in, size_is(shaderCodeCount)] BYTE* shaderCode,
-            [in] GUID effectId);
+            [in] GUID effectId,
+            [in] INT32 maxSamplerOffset,
+            [in] UINT32 coordinateMappingsSize,
+            [in, size_is(coordinateMappingsSize)] SamplerCoordinateMapping* coordinateMappings,
+            [in] UINT32 borderModesSize,
+            [in, size_is(borderModesSize)] EffectBorderMode* borderModes,
+            [in] UINT32 sourceInterpolationsSize,
+            [in, size_is(sourceInterpolationsSize)] Microsoft.Graphics.Canvas.CanvasImageInterpolation* sourceInterpolations);
 
         HRESULT CreateEffect(
             [in] GUID effectId,
@@ -30,6 +37,13 @@ namespace Microsoft.Graphics.Canvas.Effects
             [in] UINT32 shaderCodeCount,
             [in, size_is(shaderCodeCount)] BYTE* shaderCode,
             [in] GUID effectId,
+            [in] INT32 maxSamplerOffset,
+            [in] UINT32 coordinateMappingsSize,
+            [in, size_is(coordinateMappingsSize)] SamplerCoordinateMapping* coordinateMappings,
+            [in] UINT32 borderModesSize,
+            [in, size_is(borderModesSize)] EffectBorderMode* borderModes,
+            [in] UINT32 sourceInterpolationsSize,
+            [in, size_is(sourceInterpolationsSize)] Microsoft.Graphics.Canvas.CanvasImageInterpolation* sourceInterpolations,
             [out, retval] PixelShaderEffect** effect);
 
         HRESULT IsEffectRegistered([in] GUID effectId, [out, retval] boolean* result);

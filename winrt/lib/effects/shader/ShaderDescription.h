@@ -88,6 +88,21 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     };
 
 
+    // Configures the filtering mode used to sample shader source textures.
+    struct SourceInterpolationState
+    {
+        SourceInterpolationState()
+        {
+            for (int i = 0; i < MaxShaderInputs; i++)
+            {
+                Filter[i] = D2D1_FILTER_MIN_MAG_MIP_LINEAR;
+            }
+        }
+
+        D2D1_FILTER Filter[MaxShaderInputs];
+    };
+
+
     // Copyable struct stores shader program code along with metadata describing how to use the shader.
     struct ShaderDescription
     {
@@ -113,6 +128,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
         std::vector<BYTE> DefaultConstants;
         CoordinateMappingState DefaultCoordinateMapping;
+        SourceInterpolationState DefaultSourceInterpolation;
     };
 
 }}}}}

@@ -12,14 +12,6 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
     enum class CopyDirection { Read, Write };
 
-    // Configures the filtering mode used to sample shader source textures.
-    struct SourceInterpolationState
-    {
-        SourceInterpolationState();
-
-        D2D1_FILTER Filter[MaxShaderInputs];
-    };
-
 
     // Implementation state shared between PixelShaderEffect and PixelShaderEffectImpl.
     // This stores the compiled shader code, metadata obtained via shader reflection,
@@ -62,7 +54,8 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     public:
         SharedShaderState(std::shared_ptr<ShaderDescription> const& shader, std::vector<BYTE> const& constants, CoordinateMappingState const& coordinateMapping, SourceInterpolationState const& sourceInterpolation);
         SharedShaderState(BYTE* shaderCode, uint32_t shaderCodeSize);
-        static std::shared_ptr<ShaderDescription> SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId);
+        static std::shared_ptr<ShaderDescription> SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId, int32_t maxSamplerOffset, 
+            SamplerCoordinateMapping* coordinateMappings, uint32_t coordinateMappingsSize, EffectBorderMode* borderModes, uint32_t borderModesSize, CanvasImageInterpolation* sourceInterpolations, uint32_t sourceInterpolationsSize);
 
         virtual ComPtr<ISharedShaderState> Clone() override;
 
