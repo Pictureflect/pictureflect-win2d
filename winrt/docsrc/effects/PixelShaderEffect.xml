@@ -206,9 +206,9 @@ Licensed under the MIT License. See LICENSE.txt in the project root for license 
           Throws an exception if the reflection over the shader code fails. See <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.#ctor(System.Byte[])"/> for more detail about the shader code requirements.
         </p>
         <p>
-          The parameter maxSamplerOffset should be set to 0 if the offset coordinate mapping mode is not used. It can be overriden on each instance.
+          The parameter maxSamplerOffset should be set to 0 if the offset coordinate mapping mode is not used. It can be overridden on each instance.
           The coordinateMappings, borderModes and sourceInterpolations parameters are optional and can be set to null or empty or partially specified. The values in the array apply to sources 1 to 8 in order.
-          These properties can be overriden on each instance.
+          These properties can be overridden on each instance.
         </p>
       </remarks>
     </member>
@@ -227,7 +227,7 @@ Licensed under the MIT License. See LICENSE.txt in the project root for license 
       </summary>
     </member>
     <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.IsEffectRegistered(System.Guid)">
-      <summary>Check to see if the given effectId has been registered via <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect(System.Byte[],System.Guid,System.Int32,Microsoft.Graphics.Canvas.Effects.SamplerCoordinateMapping[],Microsoft.Graphics.Canvas.Effects.EffectBorderMode[],Microsoft.Graphics.Canvas.CanvasImageInterpolation[])"/>.</summary>
+      <summary>Checks to see if the given effectId has been registered via <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.RegisterEffect(System.Byte[],System.Guid,System.Int32,Microsoft.Graphics.Canvas.Effects.SamplerCoordinateMapping[],Microsoft.Graphics.Canvas.Effects.EffectBorderMode[],Microsoft.Graphics.Canvas.CanvasImageInterpolation[])"/>.</summary>
     </member>
     <member name="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.UnregisterEffect(System.Guid)">
       <summary>Removes the cached shader code with the given effectId. Does nothing if not registered.</summary>
