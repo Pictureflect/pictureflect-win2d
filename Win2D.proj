@@ -272,8 +272,8 @@
         <!-- Work out where the test binaries are located -->
         <TestPath>bin\%(ProjectsToBuild.BinDir)%(TestProjects.TestPlatform)\%(ProjectsToBuild.Configuration)</TestPath>
 
-        <TestAppX Condition="%(ProjectsToBuild.Configuration) == Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(ProjectsToBuild.Platform)</TestAppX>
-        <TestAppX Condition="%(ProjectsToBuild.Configuration) != Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(ProjectsToBuild.Platform)_%(ProjectsToBuild.Configuration)</TestAppX>
+        <TestAppX Condition="%(ProjectsToBuild.Configuration) == Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(TestProjects.TestPlatform)</TestAppX>
+        <TestAppX Condition="%(ProjectsToBuild.Configuration) != Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(TestProjects.TestPlatform)_%(ProjectsToBuild.Configuration)</TestAppX>
         <TestAppXFolder Condition="%(ProjectsToBuild.Configuration) == Release">%(ProjectsToBuild.Filename)_1.0.0.0</TestAppXFolder>
         <TestAppXFolder Condition="%(ProjectsToBuild.Configuration) != Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(ProjectsToBuild.Configuration)</TestAppXFolder>
 
