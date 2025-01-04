@@ -8,7 +8,13 @@
     <AssemblyName>Microsoft.Graphics.Canvas.Interop</AssemblyName>
     <Platforms>AnyCPU</Platforms>
     <UseUwp>true</UseUwp>
-    <UseRidGraph>true</UseRidGraph>
+
+    <!--
+      We are just building projections, we don't need to enable the UWP tooling. The only
+      "UWP" thing about this project is the fact it references 'Windows.UI.Xaml.*' types.
+      We need to opt-out because VS 17.12(+) sets this by default when "UseUwp" is set.
+    -->
+    <UseUwpTools>false</UseUwpTools>
       
     <!--
       Win2D validates the device type, and initializes it to match 'TargetPlatformIdentifier'
@@ -46,7 +52,7 @@
 
   <!-- CsWinRT related properties for projections generation -->
   <PropertyGroup>
-    <WindowsSdkPackageVersion>10.0.$([System.Version]::Parse('$(TargetPlatformVersion)').Build).48</WindowsSdkPackageVersion>
+    <WindowsSdkPackageVersion>10.0.$([System.Version]::Parse('$(TargetPlatformVersion)').Build).57</WindowsSdkPackageVersion>
     <CSWinRTIncludes>
         Microsoft.Graphics.Canvas;
     </CSWinRTIncludes>
@@ -62,7 +68,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CSWinRT" Version="2.1.5" />
-    <PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Windows.CSWinRT" Version="2.2.0" />
   </ItemGroup>
 </Project>
