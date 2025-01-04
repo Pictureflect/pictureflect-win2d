@@ -42,8 +42,7 @@
   <ItemGroup>
     <UAPProject Include="winrt\lib\winrt.lib.uap.vcxproj" />
     <UAPProject Include="winrt\dll\winrt.dll.uap.vcxproj" />
-    <!-- Todo: undisable this when a working solution can be found. -->
-    <!--<AnyCPUProject Include="winrt\projection\winrt.projection.csproj" />-->
+    <AnyCPUProject Include="winrt\projection\winrt.projection.csproj" />
   </ItemGroup>
 
   <!-- Test projects -->
