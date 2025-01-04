@@ -206,9 +206,9 @@ Licensed under the MIT License. See LICENSE.txt in the project root for license 
           Throws an exception if the reflection over the shader code fails. See <see cref="M:Microsoft.Graphics.Canvas.Effects.PixelShaderEffect.#ctor(System.Byte[])"/> for more detail about the shader code requirements.
         </p>
         <p>
-          The parameter maxSamplerOffset should be set to 0 if the offset coordinate mapping mode is not used. It can be overriden on each instance, although that would be unusual.
+          The parameter maxSamplerOffset should be set to 0 if the offset coordinate mapping mode is not used. It can be overriden on each instance.
           The coordinateMappings, borderModes and sourceInterpolations parameters are optional and can be set to null or empty or partially specified. The values in the array apply to sources 1 to 8 in order.
-          These properties can be overriden on each instance, although that would be unusual.
+          These properties can be overriden on each instance.
         </p>
       </remarks>
     </member>
