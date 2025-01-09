@@ -271,12 +271,14 @@
         <!-- Work out where the test binaries are located -->
         <TestPath>bin\%(ProjectsToBuild.BinDir)%(TestProjects.TestPlatform)\%(ProjectsToBuild.Configuration)</TestPath>
 
-        <TestAppX Condition="%(ProjectsToBuild.Configuration) == Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(ProjectsToBuild.Platform)</TestAppX>
-        <TestAppX Condition="%(ProjectsToBuild.Configuration) != Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(ProjectsToBuild.Platform)_%(ProjectsToBuild.Configuration)</TestAppX>
+        <TestAppX Condition="%(ProjectsToBuild.Configuration) == Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(TestProjects.TestPlatform)</TestAppX>
+        <TestAppX Condition="%(ProjectsToBuild.Configuration) != Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(TestProjects.TestPlatform)_%(ProjectsToBuild.Configuration)</TestAppX>
+        <TestAppXFolder Condition="%(ProjectsToBuild.Configuration) == Release">%(ProjectsToBuild.Filename)_1.0.0.0</TestAppXFolder>
+        <TestAppXFolder Condition="%(ProjectsToBuild.Configuration) != Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(ProjectsToBuild.Configuration)</TestAppXFolder>
 
-        <!-- Binaries can be either a .dll for desktop tests, or .appx for store app tests -->
+        <!-- Binaries can be either a .dll for desktop tests, or .appxbundle for store app tests -->
         <TestBinary Condition="%(ProjectsToBuild.AutomatedTests) == desktop">%(TestProjects.TestPath)\%(ProjectsToBuild.Filename)\%(ProjectsToBuild.Filename).dll</TestBinary>
-        <TestBinary Condition="%(ProjectsToBuild.AutomatedTests) == store">%(TestProjects.TestPath)\%(ProjectsToBuild.Filename)\AppPackages\%(TestProjects.TestAppX)_Test\%(TestProjects.TestAppX).appx</TestBinary>
+        <TestBinary Condition="%(ProjectsToBuild.AutomatedTests) == store">%(TestProjects.TestPath)\%(ProjectsToBuild.Filename)\AppPackages\%(TestProjects.TestAppXFolder)_Test\%(TestProjects.TestAppX).appxbundle</TestBinary>
 
         <!-- Do we need the /Platform or /InIsolation arguments for this test project? -->
         <TestArgs Condition="%(ProjectsToBuild.Platform) == x64">%(TestProjects.TestArgs) /Platform:x64</TestArgs>
