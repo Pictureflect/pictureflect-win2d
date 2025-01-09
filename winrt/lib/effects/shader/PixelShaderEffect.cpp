@@ -5,7 +5,6 @@
 #include "pch.h"
 #include "PixelShaderEffect.h"
 #include "PixelShaderEffectImpl.h"
-#include "SharedShaderState.h"
 
 namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { namespace Effects
 {
@@ -71,7 +70,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         {
             CheckAndClearOutPointer(effect);
 
-            std::shared_ptr<ShaderDescription> description{ nullptr };
+            ShaderDescriptionWithDefaults description{};
             {
                 std::lock_guard<std::recursive_mutex> lock(m_mutex);
                 auto const& cached = shaderCache.find(effectId);
@@ -80,12 +79,12 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
                 }
             }
 
-            if (description == nullptr) {
+            if (description.Description == nullptr || description.Defaults == nullptr) {
                 ThrowHR(E_INVALIDARG, Strings::CustomEffectNotRegistered);
             }
 
             // Create a shared state object using the specified shader code.
-            auto sharedState = Make<SharedShaderState>(description, description->DefaultConstants, description->DefaultCoordinateMapping, description->DefaultSourceInterpolation);
+            auto sharedState = Make<SharedShaderState>(description.Description, description.Defaults->DefaultConstants, description.Defaults->DefaultCoordinateMapping, description.Defaults->DefaultSourceInterpolation);
             CheckMakeResult(sharedState);
 
             // Create the WinRT effect instance.
@@ -130,7 +129,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     }
 
     std::recursive_mutex PixelShaderEffectFactory::m_mutex{};
-    std::map<GUID, std::shared_ptr<ShaderDescription>, GuidComparer> PixelShaderEffectFactory::shaderCache{};
+    std::map<GUID, ShaderDescriptionWithDefaults, GuidComparer> PixelShaderEffectFactory::shaderCache{};
 
 
     // Describe how to implement WinRT IMap<> methods in terms of our shader constant buffer.
