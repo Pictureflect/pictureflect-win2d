@@ -12,6 +12,45 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
     enum class CopyDirection { Read, Write };
 
+    const int MaxShaderInputs = 8;
+
+
+    // Describes how this shader maps between its input images and output locations.
+    struct CoordinateMappingState
+    {
+        CoordinateMappingState();
+
+        SamplerCoordinateMapping Mapping[MaxShaderInputs];
+        EffectBorderMode BorderMode[MaxShaderInputs];
+        int MaxOffset;
+    };
+
+
+    // Configures the filtering mode used to sample shader source textures.
+    struct SourceInterpolationState
+    {
+        SourceInterpolationState();
+
+        D2D1_FILTER Filter[MaxShaderInputs];
+    };
+
+
+    // Primarily used for caching
+    struct SharedShaderStateDefaults
+    {
+        std::vector<BYTE> DefaultConstants;
+        CoordinateMappingState DefaultCoordinateMapping;
+        SourceInterpolationState DefaultSourceInterpolation;
+    };
+
+
+    // Primarily used for caching
+    struct ShaderDescriptionWithDefaults
+    {
+        std::shared_ptr<ShaderDescription> Description;
+        std::shared_ptr<SharedShaderStateDefaults> Defaults;
+    };
+
 
     // Implementation state shared between PixelShaderEffect and PixelShaderEffectImpl.
     // This stores the compiled shader code, metadata obtained via shader reflection,
@@ -54,7 +93,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
     public:
         SharedShaderState(std::shared_ptr<ShaderDescription> const& shader, std::vector<BYTE> const& constants, CoordinateMappingState const& coordinateMapping, SourceInterpolationState const& sourceInterpolation);
         SharedShaderState(BYTE* shaderCode, uint32_t shaderCodeSize);
-        static std::shared_ptr<ShaderDescription> SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId, int32_t maxSamplerOffset, 
+        static ShaderDescriptionWithDefaults SharedShaderState::CreateShaderDescription(BYTE* shaderCode, uint32_t shaderCodeSize, IID const& effectId, int32_t maxSamplerOffset, 
             SamplerCoordinateMapping* coordinateMappings, uint32_t coordinateMappingsSize, EffectBorderMode* borderModes, uint32_t borderModesSize, CanvasImageInterpolation* sourceInterpolations, uint32_t sourceInterpolationsSize);
 
         virtual ComPtr<ISharedShaderState> Clone() override;
@@ -87,12 +126,12 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
         void CopyConstantData(ShaderVariable const& variable, TComponent* values);
 
 
-        // Shader reflection (done at init time).
-        static void ReflectOverShader(std::shared_ptr<ShaderDescription> const& outputDescription);
-        static void ReflectOverBindings(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflection* reflector, D3D11_SHADER_DESC const& desc);
-        static void ReflectOverConstantBuffer(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflectionConstantBuffer* constantBuffer);
-        static void ReflectOverVariable(std::shared_ptr<ShaderDescription> const& outputDescription, ID3D11ShaderReflectionVariable* variable);
-        static void ReflectOverShaderLinkingFunction(std::shared_ptr<ShaderDescription> const& outputDescription);
+        // Shader reflection (done at init time). Note the members of the output must be non-null before calling these functions.
+        static void ReflectOverShader(ShaderDescriptionWithDefaults const& output);
+        static void ReflectOverBindings(ShaderDescriptionWithDefaults const& output, ID3D11ShaderReflection* reflector, D3D11_SHADER_DESC const& desc);
+        static void ReflectOverConstantBuffer(ShaderDescriptionWithDefaults const& output, ID3D11ShaderReflectionConstantBuffer* constantBuffer);
+        static void ReflectOverVariable(ShaderDescriptionWithDefaults const& output, ID3D11ShaderReflectionVariable* variable);
+        static void ReflectOverShaderLinkingFunction(ShaderDescriptionWithDefaults const& output);
     };
 
 }}}}}

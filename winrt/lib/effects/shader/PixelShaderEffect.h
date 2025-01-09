@@ -6,6 +6,7 @@
 
 #include "../../utils/GuidUtilities.h"
 #include "ShaderDescription.h"
+#include "SharedShaderState.h"
 
 namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { namespace Effects 
 {
@@ -47,7 +48,7 @@ namespace ABI { namespace Microsoft { namespace Graphics { namespace Canvas { na
 
     private:
         static std::recursive_mutex m_mutex;
-        static std::map<GUID, std::shared_ptr<ShaderDescription>, GuidComparer> shaderCache;
+        static std::map<GUID, ShaderDescriptionWithDefaults, GuidComparer> shaderCache;
     };
 
 
