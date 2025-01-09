@@ -334,13 +334,24 @@ namespace test.managed
             ";
 
             var effectId = Guid.Parse("A686195C-AEA4-45B7-87EF-BDD57776A7F4");
-            var effect = PixelShaderEffect.RegisterAndCreateEffect(ShaderCompiler.CompileShader(hlsl, "ps_4_0"), effectId, 0, null, null, null);
+            var shaderBytes = ShaderCompiler.CompileShader(hlsl, "ps_4_0");
+            var effect = PixelShaderEffect.RegisterAndCreateEffect(shaderBytes, effectId, 0, null, null, null);
 
             using (var canvasDevice = new CanvasDevice())
             using (var renderTarget = new CanvasRenderTarget(canvasDevice, 1, 1, 96))
             using (var drawingSession = renderTarget.CreateDrawingSession()) {
                 drawingSession.DrawImage(effect);
             }
+
+            Assert.IsTrue(PixelShaderEffect.IsEffectRegistered(effectId));
+            PixelShaderEffect.UnregisterEffect(effectId);
+            Assert.IsFalse(PixelShaderEffect.IsEffectRegistered(effectId));
+            PixelShaderEffect.RegisterEffect(shaderBytes, effectId, 1, new SamplerCoordinateMapping[] { SamplerCoordinateMapping.Offset }, new EffectBorderMode[] { EffectBorderMode.Hard }, new CanvasImageInterpolation[] { CanvasImageInterpolation.NearestNeighbor });
+            effect = PixelShaderEffect.CreateEffect(effectId);
+            Assert.AreEqual(effect.MaxSamplerOffset, 1);
+            Assert.AreEqual(effect.Source1Mapping, SamplerCoordinateMapping.Offset);
+            Assert.AreEqual(effect.Source1BorderMode, EffectBorderMode.Hard);
+            Assert.AreEqual(effect.Source1Interpolation, CanvasImageInterpolation.NearestNeighbor);
         }
 
         [TestMethod]
