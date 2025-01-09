@@ -268,7 +268,7 @@
         <TestPlatform Condition="%(ProjectsToBuild.Platform) == Win32">x86</TestPlatform>
         <TestPlatform Condition="%(ProjectsToBuild.Platform) != Win32">%(ProjectsToBuild.Platform)</TestPlatform>
 
-                <!-- Work out where the test binaries are located -->
+        <!-- Work out where the test binaries are located -->
         <TestPath>bin\%(ProjectsToBuild.BinDir)%(TestProjects.TestPlatform)\%(ProjectsToBuild.Configuration)</TestPath>
 
         <TestAppX Condition="%(ProjectsToBuild.Configuration) == Release">%(ProjectsToBuild.Filename)_1.0.0.0_%(TestProjects.TestPlatform)</TestAppX>
