@@ -33,6 +33,7 @@
 #include "GammaTransferEffect.h"
 #include "GaussianBlurEffect.h"
 #include "GrayscaleEffect.h"
+#include "HdrToneMapEffect.h"
 #include "HighlightsAndShadowsEffect.h"
 #include "HueRotationEffect.h"
 #include "HueToRgbEffect.h"
@@ -65,6 +66,7 @@
 #include "TurbulenceEffect.h"
 #include "UnPremultiplyEffect.h"
 #include "VignetteEffect.h"
+#include "WhiteLevelAdjustmentEffect.h"
 
 
 std::pair<IID, CanvasEffect::MakeEffectFunction> CanvasEffect::m_effectMakers[] =
@@ -96,6 +98,7 @@ std::pair<IID, CanvasEffect::MakeEffectFunction> CanvasEffect::m_effectMakers[] 
     { GammaTransferEffect::EffectId(),        MakeEffect<GammaTransferEffect>        },
     { GaussianBlurEffect::EffectId(),         MakeEffect<GaussianBlurEffect>         },
     { GrayscaleEffect::EffectId(),            MakeEffect<GrayscaleEffect>            },
+    { HdrToneMapEffect::EffectId(),           MakeEffect<HdrToneMapEffect>           },
     { HighlightsAndShadowsEffect::EffectId(), MakeEffect<HighlightsAndShadowsEffect> },
     { HueRotationEffect::EffectId(),          MakeEffect<HueRotationEffect>          },
     { HueToRgbEffect::EffectId(),             MakeEffect<HueToRgbEffect>             },
@@ -128,6 +131,7 @@ std::pair<IID, CanvasEffect::MakeEffectFunction> CanvasEffect::m_effectMakers[] 
     { TurbulenceEffect::EffectId(),           MakeEffect<TurbulenceEffect>           },
     { UnPremultiplyEffect::EffectId(),        MakeEffect<UnPremultiplyEffect>        },
     { VignetteEffect::EffectId(),             MakeEffect<VignetteEffect>             },
+    { WhiteLevelAdjustmentEffect::EffectId(), MakeEffect<WhiteLevelAdjustmentEffect> },
 
     { GUID_NULL, nullptr }
 };
